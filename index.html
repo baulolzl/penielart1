@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>브니엘예술고등학교 자율적 교육과정 수강신청</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Apple SD Gothic Neo','Malgun Gothic','Noto Sans KR',sans-serif;background:#f5f5f3;color:#1a1a1a;min-height:100vh}
+.screen{display:none}.screen.active{display:block}
+.page-wrap{min-height:100vh;padding:2rem 1rem}
+.center-card{max-width:460px;margin:0 auto;background:#fff;border:1px solid #e8e8e5;border-radius:14px;padding:2rem;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.logo-area{text-align:center;margin-bottom:1.75rem}
+.logo-area .school-name{font-size:12px;color:#888;margin-bottom:4px;letter-spacing:.06em}
+.logo-area h1{font-size:19px;font-weight:600;color:#1a1a1a}
+.tab-btns{display:flex;border:1px solid #e8e8e5;border-radius:8px;overflow:hidden;margin-bottom:1.5rem}
+.tab-btn{flex:1;padding:10px;font-size:14px;background:transparent;border:none;cursor:pointer;color:#888;transition:all .15s;font-family:inherit}
+.tab-btn.active{background:#f5f5f3;color:#1a1a1a;font-weight:600}
+.field-group{margin-bottom:1rem}
+.field-group label{display:block;font-size:13px;color:#666;margin-bottom:6px}
+.field-group input,.field-group select{width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;background:#fff;color:#1a1a1a;font-family:inherit;outline:none;transition:border .15s}
+.field-group input:focus,.field-group select:focus{border-color:#185FA5}
+.btn-primary{width:100%;padding:11px;background:#1a1a1a;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;margin-top:.5rem;font-family:inherit;transition:opacity .15s}
+.btn-primary:hover{opacity:.85}
+.error-msg{font-size:13px;color:#d9534f;margin-top:8px;min-height:18px}
+.grade-btns{display:flex;gap:8px;margin-bottom:1rem}
+.grade-btn{flex:1;padding:10px 0;font-size:14px;background:transparent;border:1px solid #ddd;border-radius:8px;cursor:pointer;color:#666;transition:all .15s;font-weight:600;font-family:inherit}
+.grade-btn:hover{background:#f5f5f3}
+.grade-btn.active{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
+.class-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:1.25rem}
+.class-btn{padding:12px 0;font-size:14px;background:transparent;border:1px solid #ddd;border-radius:8px;cursor:pointer;color:#666;transition:all .15s;font-weight:600;font-family:inherit}
+.class-btn:hover{background:#f5f5f3}
+.class-btn.active{background:#185FA5;color:#fff;border-color:#185FA5}
+.selected-class-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;background:#e8f0fb;border-radius:8px;font-size:13px;color:#185FA5;font-weight:600;margin-bottom:1rem}
+.dashboard-wrap{max-width:960px;margin:0 auto}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid #e8e8e5;background:#fff;padding:1rem 1.5rem;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.05);margin-bottom:1.25rem}
+.topbar-left .school{font-size:12px;color:#888}
+.topbar-left .user-name{font-size:16px;font-weight:600;color:#1a1a1a}
+.btn-sm{padding:7px 16px;font-size:13px;background:transparent;border:1px solid #ddd;border-radius:8px;cursor:pointer;color:#666;font-family:inherit;transition:all .15s}
+.btn-sm:hover{background:#f5f5f3}
+.btn-danger-sm{padding:5px 10px;font-size:13px;background:transparent;border:1px solid #ddd;border-radius:8px;cursor:pointer;color:#d9534f;font-family:inherit}
+.section-title{font-size:15px;font-weight:600;margin-bottom:1rem;color:#1a1a1a}
+.card-box{background:#fff;border:1px solid #e8e8e5;border-radius:12px;padding:1.25rem;margin-bottom:1rem;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.course-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-bottom:1rem}
+.course-card{background:#fff;border:1px solid #e8e8e5;border-radius:10px;padding:1rem;cursor:pointer;transition:all .15s;position:relative;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.course-card:hover{border-color:#bbb;transform:translateY(-1px);box-shadow:0 3px 10px rgba(0,0,0,.08)}
+.course-card.selected{border:2px solid #185FA5;background:#e8f0fb}
+.course-title{font-size:14px;font-weight:600;color:#1a1a1a;margin-bottom:4px}
+.course-cat{font-size:12px;color:#888}
+.course-info{font-size:12px;color:#888;margin-top:6px}
+.check-badge{position:absolute;top:10px;right:10px;width:22px;height:22px;border-radius:50%;background:#185FA5;display:none;align-items:center;justify-content:center}
+.course-card.selected .check-badge{display:flex}
+.check-badge svg{width:13px;height:13px;stroke:#fff;stroke-width:2.5;fill:none}
+.add-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:1rem}
+.add-form-grid input{padding:9px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px;background:#fff;color:#1a1a1a;font-family:inherit;outline:none}
+.add-form-grid input:focus{border-color:#185FA5}
+.btn-add{padding:9px 18px;background:#1a1a1a;color:#fff;border:none;border-radius:8px;font-size:13px;cursor:pointer;font-family:inherit;white-space:nowrap}
+.btn-add:hover{opacity:.85}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{text-align:left;padding:9px 12px;color:#888;border-bottom:1px solid #e8e8e5;font-weight:500;white-space:nowrap}
+.tbl td{padding:10px 12px;border-bottom:1px solid #f0f0ee;color:#1a1a1a;vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:#fafaf8}
+.tag{display:inline-block;font-size:11px;padding:3px 9px;border-radius:6px;margin:2px 2px 2px 0;font-weight:500}
+.tag-blue{background:#e8f0fb;color:#185FA5}
+.tag-green{background:#eaf3de;color:#3B6D11}
+.my-list{display:flex;flex-direction:column;gap:8px}
+.my-item{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#f8f8f6;border-radius:8px}
+.my-item .name{font-size:14px;font-weight:600;color:#1a1a1a}
+.my-item .cat{font-size:12px;color:#888}
+.btn-remove{background:transparent;border:none;cursor:pointer;color:#bbb;padding:4px;line-height:1}
+.btn-remove:hover{color:#d9534f}
+.empty-state{text-align:center;padding:1.5rem;color:#aaa;font-size:13px}
+.confirm-btn{width:100%;padding:12px;background:#185FA5;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;margin-top:1rem;font-family:inherit;transition:opacity .15s}
+.confirm-btn:hover{opacity:.9}
+.confirm-btn:disabled{opacity:.35;cursor:not-allowed}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1.25rem}
+.stat-card{background:#fff;border:1px solid #e8e8e5;border-radius:10px;padding:1rem;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.stat-num{font-size:24px;font-weight:700;color:#1a1a1a}
+.stat-label{font-size:12px;color:#888;margin-top:3px}
+.admin-tabs{display:flex;gap:8px;margin-bottom:1.25rem;flex-wrap:wrap}
+.admin-tab{padding:8px 18px;font-size:13px;background:#fff;border:1px solid #e8e8e5;border-radius:8px;cursor:pointer;color:#666;font-family:inherit;font-weight:500;transition:all .15s}
+.admin-tab:hover{border-color:#bbb}
+.admin-tab.active{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
+.success-banner{background:#eaf3de;border-radius:8px;padding:12px 16px;font-size:13px;color:#3B6D11;margin-bottom:1rem;display:none;font-weight:500}
+.search-input{width:100%;padding:9px 12px;border:1px solid #ddd;border-radius:8px;font-size:13px;background:#fff;color:#1a1a1a;margin-bottom:1rem;font-family:inherit;outline:none}
+.search-input:focus{border-color:#185FA5}
+.dl-card-all{display:flex;align-items:center;gap:12px;padding:14px 18px;background:#eaf3de;border:1px solid #c0dd97;border-radius:10px;cursor:pointer;transition:all .15s;margin-bottom:12px}
+.dl-card-all:hover{background:#c0dd97}
+.dl-card-all .dl-icon{font-size:22px;color:#3B6D11}
+.dl-card-all .dl-name{font-size:14px;font-weight:600;color:#27500A}
+.dl-card-all .dl-sub{font-size:12px;color:#3B6D11}
+.dl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:8px;margin-bottom:1.5rem}
+.dl-card{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#f8f8f6;border:1px solid #e8e8e5;border-radius:9px;cursor:pointer;transition:all .15s}
+.dl-card:hover{border-color:#bbb;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.dl-icon-sm{font-size:18px;color:#3B6D11}
+.dl-name{font-size:13px;font-weight:600;color:#1a1a1a}
+.dl-sub{font-size:11px;color:#888}
+.dl-section-title{font-size:14px;font-weight:600;color:#1a1a1a;margin-bottom:.4rem;margin-top:1.25rem}
+.dl-section-title:first-child{margin-top:0}
+.dl-subtitle{font-size:12px;color:#888;margin-bottom:.75rem}
+.desc-input{flex:1;padding:9px 10px;border:1px solid #ddd;border-radius:8px;font-size:13px;background:#fff;color:#1a1a1a;font-family:inherit;outline:none}
+.desc-input:focus{border-color:#185FA5}
+</style>
+</head>
+<body>
+
+<!-- ── LOGIN ── -->
+<div id="screen-login" class="screen active">
+  <div class="page-wrap" style="display:flex;align-items:center;justify-content:center;min-height:100vh">
+    <div class="center-card">
+      <div class="logo-area">
+        <div class="school-name">브니엘예술고등학교</div>
+        <h1>자율적 교육과정 수강신청</h1>
+      </div>
+      <div class="tab-btns">
+        <button class="tab-btn active" onclick="switchTab('student')" id="tab-student">학생 로그인</button>
+        <button class="tab-btn" onclick="switchTab('teacher')" id="tab-teacher">교사 로그인</button>
+      </div>
+
+      <div id="form-student">
+        <div class="field-group">
+          <label>학년 선택</label>
+          <div class="grade-btns">
+            <button class="grade-btn" onclick="selectGrade(1)" id="gb-1">1학년</button>
+            <button class="grade-btn" onclick="selectGrade(2)" id="gb-2">2학년</button>
+            <button class="grade-btn" onclick="selectGrade(3)" id="gb-3">3학년</button>
+          </div>
+        </div>
+        <div class="field-group">
+          <label>반 선택</label>
+          <div class="class-grid">
+            <button class="class-btn" onclick="selectClass(1)" id="cb-1">1반</button>
+            <button class="class-btn" onclick="selectClass(2)" id="cb-2">2반</button>
+            <button class="class-btn" onclick="selectClass(3)" id="cb-3">3반</button>
+            <button class="class-btn" onclick="selectClass(4)" id="cb-4">4반</button>
+            <button class="class-btn" onclick="selectClass(5)" id="cb-5">5반</button>
+          </div>
+        </div>
+        <div id="class-selected-badge" style="display:none" class="selected-class-badge">
+          🏫 <span id="class-badge-text"></span>
+        </div>
+        <div class="field-group">
+          <label>학번</label>
+          <input type="text" id="s-id" placeholder="학번 입력" maxlength="10"/>
+        </div>
+        <div class="field-group">
+          <label>이름</label>
+          <input type="text" id="s-name" placeholder="본인 이름 입력"/>
+        </div>
+        <div id="s-error" class="error-msg"></div>
+        <button class="btn-primary" onclick="loginStudent()">수강신청 시작</button>
+      </div>
+
+      <div id="form-teacher" style="display:none">
+        <div class="field-group"><label>아이디</label><input type="text" id="t-id" placeholder="교사 아이디"/></div>
+        <div class="field-group"><label>비밀번호</label><input type="password" id="t-pw" placeholder="비밀번호"/></div>
+        <div id="t-error" class="error-msg"></div>
+        <button class="btn-primary" onclick="loginTeacher()">관리자 로그인</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── STUDENT ── -->
+<div id="screen-student" class="screen">
+  <div class="page-wrap">
+    <div class="dashboard-wrap">
+      <div class="topbar">
+        <div class="topbar-left">
+          <div class="school">브니엘예술고등학교 자율적 교육과정</div>
+          <div class="user-name" id="s-welcome"></div>
+        </div>
+        <button class="btn-sm" onclick="logout()">로그아웃</button>
+      </div>
+      <div id="s-success-banner" class="success-banner">✅ 수강신청이 완료되었습니다!</div>
+      <div style="display:grid;grid-template-columns:1fr 300px;gap:1.25rem;align-items:start">
+        <div>
+          <div class="section-title">수강 가능한 과목</div>
+          <div id="course-list" class="course-grid"></div>
+        </div>
+        <div>
+          <div class="card-box">
+            <div class="section-title">선택한 과목 <span id="selected-count" style="font-size:13px;font-weight:400;color:#888">0개</span></div>
+            <div id="my-courses" class="my-list"></div>
+            <button class="confirm-btn" id="confirm-btn" onclick="confirmRegistration()" disabled>수강신청 완료</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── TEACHER ── -->
+<div id="screen-teacher" class="screen">
+  <div class="page-wrap">
+    <div class="dashboard-wrap">
+      <div class="topbar">
+        <div class="topbar-left">
+          <div class="school">브니엘예술고등학교 자율적 교육과정</div>
+          <div class="user-name">관리자 대시보드</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn-danger-sm" onclick="resetAll()" style="font-size:12px">데이터 초기화</button>
+          <button class="btn-sm" onclick="logout()">로그아웃</button>
+        </div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-num" id="stat-courses">0</div><div class="stat-label">등록 과목 수</div></div>
+        <div class="stat-card"><div class="stat-num" id="stat-students">0</div><div class="stat-label">신청 학생 수</div></div>
+        <div class="stat-card"><div class="stat-num" id="stat-total">0</div><div class="stat-label">총 수강신청 건수</div></div>
+        <div class="stat-card"><div class="stat-num" id="stat-complete">0</div><div class="stat-label">신청 완료</div></div>
+      </div>
+      <div class="admin-tabs">
+        <button class="admin-tab active" onclick="adminTab('courses')" id="atab-courses">과목 관리</button>
+        <button class="admin-tab" onclick="adminTab('students')" id="atab-students">신청 현황</button>
+        <button class="admin-tab" onclick="adminTab('download')" id="atab-download">엑셀 다운로드</button>
+        <button class="admin-tab" onclick="adminTab('settings')" id="atab-settings">계정 설정</button>
+      </div>
+
+      <!-- 과목 관리 -->
+      <div id="admin-courses">
+        <div class="card-box">
+          <div class="section-title">새 과목 추가</div>
+          <div class="add-form-grid">
+            <input type="text" id="new-title" placeholder="과목명"/>
+            <input type="text" id="new-cat" placeholder="분야 (예: 음악, 미술)"/>
+            <input type="text" id="new-teacher" placeholder="담당 교사"/>
+            <input type="number" id="new-max" placeholder="정원" min="1" max="100"/>
+          </div>
+          <div style="margin-top:10px;display:flex;gap:8px">
+            <input type="text" id="new-desc" class="desc-input" placeholder="과목 설명 (선택)"/>
+            <button class="btn-add" onclick="addCourse()">+ 추가</button>
+          </div>
+        </div>
+        <div class="card-box">
+          <div class="section-title">등록된 과목 목록</div>
+          <div id="admin-course-list"></div>
+        </div>
+      </div>
+
+      <!-- 신청 현황 -->
+      <div id="admin-students" style="display:none">
+        <div class="card-box">
+          <input class="search-input" type="text" id="search-student" placeholder="학번 또는 이름으로 검색..." oninput="renderStudentTable()"/>
+          <div id="student-table-wrap"></div>
+        </div>
+      </div>
+
+      <!-- 엑셀 다운로드 -->
+      <div id="admin-download" style="display:none">
+        <div class="card-box">
+          <div class="dl-card-all" onclick="downloadAll()">
+            <span class="dl-icon">📊</span>
+            <div>
+              <div class="dl-name">전체 수강신청 현황 다운로드</div>
+              <div class="dl-sub">모든 학생 내역 + 반별 시트 + 과목별 시트</div>
+            </div>
+          </div>
+          <div class="dl-section-title">반별 다운로드</div>
+          <div class="dl-subtitle">반을 선택하면 해당 반 수강신청 내역을 엑셀로 내려받습니다.</div>
+          <div id="dl-class-grid" class="dl-grid"></div>
+          <div class="dl-section-title">과목별 다운로드</div>
+          <div class="dl-subtitle">과목을 선택하면 해당 과목 신청 학생 명단을 엑셀로 내려받습니다.</div>
+          <div id="dl-course-grid" class="dl-grid"></div>
+        </div>
+      </div>
+
+      <!-- 계정 설정 -->
+      <div id="admin-settings" style="display:none">
+        <div class="card-box" style="max-width:400px">
+          <div class="section-title">계정 설정</div>
+          <div class="field-group" style="margin-top:1rem"><label>아이디 변경</label><input type="text" id="new-t-id" placeholder="새 아이디"/></div>
+          <div class="field-group"><label>현재 비밀번호</label><input type="password" id="cur-pw" placeholder="현재 비밀번호"/></div>
+          <div class="field-group"><label>새 비밀번호</label><input type="password" id="new-pw" placeholder="새 비밀번호"/></div>
+          <div class="field-group"><label>비밀번호 확인</label><input type="password" id="new-pw2" placeholder="새 비밀번호 재입력"/></div>
+          <div id="set-msg" class="error-msg"></div>
+          <button class="btn-primary" onclick="saveSettings()">저장</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+const GRADES=[1,2,3],CLASSES=[1,2,3,4,5];
+const CL=(g,c)=>g+'학년 '+c+'반';
+const K={C:'bniel_courses',R:'bniel_regs',T:'bniel_teacher',N:'bniel_nextid'};
+const DEFAULT_COURSES=[
+  {id:1,title:'피아노 앙상블',cat:'음악',teacher:'김음악',max:15,desc:'피아노 중심의 앙상블 활동'},
+  {id:2,title:'현대무용 기초',cat:'무용',teacher:'이무용',max:12,desc:'현대무용의 기초 동작 탐구'},
+  {id:3,title:'수채화 실습',cat:'미술',teacher:'박미술',max:10,desc:'수채화 기법 집중 실습'},
+  {id:4,title:'연기 워크숍',cat:'연극',teacher:'최연극',max:14,desc:'즉흥 연기 및 장면 연습'},
+  {id:5,title:'성악 발성',cat:'음악',teacher:'정성악',max:8,desc:'발성법과 호흡 훈련'},
+  {id:6,title:'영상 편집',cat:'영상',teacher:'한영상',max:16,desc:'영상 제작 및 편집 기초'},
+];
+
+// localStorage 헬퍼
+function lsGet(k,fb){try{const v=localStorage.getItem(k);return v!==null?JSON.parse(v):fb;}catch(e){return fb;}}
+function lsSet(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+function getCourses(){return lsGet(K.C,DEFAULT_COURSES);}
+function saveCourses(c){lsSet(K.C,c);}
+function getRegs(){return lsGet(K.R,{});}
+function saveRegs(r){lsSet(K.R,r);}
+function getTeacher(){return lsGet(K.T,{id:'admin',pw:'1234'});}
+function saveTeacher(t){lsSet(K.T,t);}
+function getNextId(){return lsGet(K.N,7);}
+function saveNextId(n){lsSet(K.N,n);}
+
+// 세션(로그인 정보)만 메모리
+let sess={user:null,loginGrade:null,loginClass:null};
+
+function switchTab(tab){
+  document.getElementById('form-student').style.display=tab==='student'?'block':'none';
+  document.getElementById('form-teacher').style.display=tab==='teacher'?'block':'none';
+  document.getElementById('tab-student').classList.toggle('active',tab==='student');
+  document.getElementById('tab-teacher').classList.toggle('active',tab==='teacher');
+  ['s-error','t-error'].forEach(x=>document.getElementById(x).textContent='');
+}
+function selectGrade(g){
+  sess.loginGrade=g;
+  GRADES.forEach(x=>document.getElementById('gb-'+x).classList.toggle('active',x===g));
+  updateBadge();
+}
+function selectClass(c){
+  sess.loginClass=c;
+  CLASSES.forEach(x=>document.getElementById('cb-'+x).classList.toggle('active',x===c));
+  updateBadge();
+}
+function updateBadge(){
+  const badge=document.getElementById('class-selected-badge');
+  if(sess.loginGrade&&sess.loginClass){
+    badge.style.display='inline-flex';
+    document.getElementById('class-badge-text').textContent=CL(sess.loginGrade,sess.loginClass)+' 로그인';
+  } else badge.style.display='none';
+}
+function loginStudent(){
+  const id=document.getElementById('s-id').value.trim();
+  const name=document.getElementById('s-name').value.trim();
+  const err=document.getElementById('s-error');
+  if(!sess.loginGrade){err.textContent='학년을 선택해주세요.';return;}
+  if(!sess.loginClass){err.textContent='반을 선택해주세요.';return;}
+  if(!id){err.textContent='학번을 입력해주세요.';return;}
+  if(!name){err.textContent='이름을 입력해주세요.';return;}
+  const g=sess.loginGrade,c=sess.loginClass;
+  sess.user={type:'student',id,name,grade:g,cls:c};
+  const regs=getRegs();
+  if(!regs[id]) regs[id]={name,grade:g,cls:c,selected:[],completed:false};
+  saveRegs(regs);
+  showScreen('student');renderStudentView();
+}
+function loginTeacher(){
+  const id=document.getElementById('t-id').value.trim();
+  const pw=document.getElementById('t-pw').value;
+  const t=getTeacher();
+  if(id!==t.id||pw!==t.pw){document.getElementById('t-error').textContent='아이디 또는 비밀번호가 올바르지 않습니다.';return;}
+  sess.user={type:'teacher'};
+  showScreen('teacher');renderTeacherView();
+}
+function logout(){
+  sess={user:null,loginGrade:null,loginClass:null};
+  GRADES.forEach(x=>document.getElementById('gb-'+x).classList.remove('active'));
+  CLASSES.forEach(x=>document.getElementById('cb-'+x).classList.remove('active'));
+  document.getElementById('class-selected-badge').style.display='none';
+  ['s-id','s-name','t-id','t-pw'].forEach(x=>document.getElementById(x).value='');
+  ['s-error','t-error'].forEach(x=>document.getElementById(x).textContent='');
+  document.getElementById('s-success-banner').style.display='none';
+  showScreen('login');
+}
+
+function showScreen(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+}
+
+function renderStudentView(){
+  const u=sess.user;
+  document.getElementById('s-welcome').textContent=CL(u.grade,u.cls)+' '+u.name+' ('+u.id+')';
+  const reg=getRegs()[u.id];
+  if(reg&&reg.completed) document.getElementById('s-success-banner').style.display='block';
+  const sel=reg?reg.selected:[];
+  renderCourseList(sel);renderMyCourses(sel);
+}
+
+function renderCourseList(selected){
+  const courses=getCourses();
+  const el=document.getElementById('course-list');
+  if(!courses.length){el.innerHTML='<div class="empty-state" style="grid-column:1/-1">등록된 과목이 없습니다.<br>교사에게 문의해주세요.</div>';return;}
+  el.innerHTML=courses.map(c=>{
+    const sel=selected.includes(c.id);
+    return `<div class="course-card ${sel?'selected':''}" onclick="toggleCourse(${c.id})">
+      <div class="check-badge"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+      <div class="course-title">${c.title}</div>
+      <div class="course-cat">${c.cat}</div>
+      <div class="course-info">👤 ${c.teacher} &nbsp;|&nbsp; 정원 ${c.max}명</div>
+      ${c.desc?`<div class="course-info" style="margin-top:4px">${c.desc}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function renderMyCourses(selected){
+  const wrap=document.getElementById('my-courses');
+  const btn=document.getElementById('confirm-btn');
+  const count=document.getElementById('selected-count');
+  const reg=getRegs()[sess.user.id];
+  count.textContent=selected.length+'개';
+  if(!selected.length){wrap.innerHTML='<div class="empty-state">과목을 선택해주세요</div>';btn.disabled=true;return;}
+  btn.disabled=!!(reg&&reg.completed);
+  const courses=getCourses();
+  wrap.innerHTML=selected.map(id=>{
+    const c=courses.find(x=>x.id===id);if(!c)return '';
+    return `<div class="my-item">
+      <div><div class="name">${c.title}</div><div class="cat">${c.cat}</div></div>
+      ${!(reg&&reg.completed)?`<button class="btn-remove" onclick="toggleCourse(${c.id})">✕</button>`:''}
+    </div>`;
+  }).join('');
+}
+
+function toggleCourse(id){
+  const regs=getRegs();
+  const reg=regs[sess.user.id];
+  if(!reg||reg.completed)return;
+  const idx=reg.selected.indexOf(id);
+  if(idx===-1)reg.selected.push(id);else reg.selected.splice(idx,1);
+  saveRegs(regs);
+  renderCourseList(reg.selected);renderMyCourses(reg.selected);
+}
+
+function confirmRegistration(){
+  const regs=getRegs();
+  const reg=regs[sess.user.id];
+  if(!reg||!reg.selected.length)return;
+  reg.completed=true;
+  saveRegs(regs);
+  document.getElementById('s-success-banner').style.display='block';
+  document.getElementById('confirm-btn').disabled=true;
+  renderMyCourses(reg.selected);renderCourseList(reg.selected);
+}
+
+function renderTeacherView(){updateStats();renderAdminCourseList();renderStudentTable();renderDownloadTab();}
+
+function updateStats(){
+  const courses=getCourses();
+  const regs=Object.values(getRegs());
+  document.getElementById('stat-courses').textContent=courses.length;
+  document.getElementById('stat-students').textContent=regs.filter(r=>r.selected.length>0).length;
+  document.getElementById('stat-total').textContent=regs.reduce((a,r)=>a+r.selected.length,0);
+  document.getElementById('stat-complete').textContent=regs.filter(r=>r.completed).length;
+}
+
+function renderAdminCourseList(){
+  const courses=getCourses();
+  const regs=Object.values(getRegs());
+  const wrap=document.getElementById('admin-course-list');
+  if(!courses.length){wrap.innerHTML='<div class="empty-state">등록된 과목이 없습니다.</div>';return;}
+  wrap.innerHTML=`<table class="tbl">
+    <thead><tr><th>과목명</th><th>분야</th><th>담당교사</th><th>정원</th><th>신청수</th><th></th></tr></thead>
+    <tbody>${courses.map(c=>{
+      const cnt=regs.filter(r=>r.selected.includes(c.id)).length;
+      return `<tr><td>${c.title}</td><td>${c.cat}</td><td>${c.teacher}</td><td>${c.max}명</td><td>${cnt}명</td>
+        <td><button class="btn-danger-sm" onclick="deleteCourse(${c.id})">삭제</button></td></tr>`;
+    }).join('')}</tbody></table>`;
+}
+
+function deleteCourse(id){
+  if(!confirm('과목을 삭제하면 해당 과목의 수강신청도 취소됩니다. 삭제하시겠습니까?'))return;
+  saveCourses(getCourses().filter(c=>c.id!==id));
+  const regs=getRegs();
+  Object.values(regs).forEach(r=>{r.selected=r.selected.filter(s=>s!==id);});
+  saveRegs(regs);
+  updateStats();renderAdminCourseList();renderDownloadTab();
+}
+
+function addCourse(){
+  const title=document.getElementById('new-title').value.trim();
+  const cat=document.getElementById('new-cat').value.trim();
+  const teacher=document.getElementById('new-teacher').value.trim();
+  const max=parseInt(document.getElementById('new-max').value)||20;
+  const desc=document.getElementById('new-desc').value.trim();
+  if(!title||!cat||!teacher){alert('과목명, 분야, 담당 교사를 입력해주세요.');return;}
+  const courses=getCourses();
+  const nid=getNextId();
+  courses.push({id:nid,title,cat,teacher,max,desc});
+  saveCourses(courses);saveNextId(nid+1);
+  ['new-title','new-cat','new-teacher','new-max','new-desc'].forEach(x=>document.getElementById(x).value='');
+  updateStats();renderAdminCourseList();renderDownloadTab();
+}
+
+function renderStudentTable(){
+  const q=(document.getElementById('search-student')||{}).value||'';
+  const wrap=document.getElementById('student-table-wrap');
+  const courses=getCourses();
+  const entries=Object.entries(getRegs()).filter(([id,r])=>id.includes(q)||r.name.includes(q));
+  if(!entries.length){wrap.innerHTML='<div class="empty-state">신청 내역이 없습니다.</div>';return;}
+  wrap.innerHTML=`<table class="tbl">
+    <thead><tr><th>학번</th><th>학년/반</th><th>이름</th><th>신청 과목</th><th>상태</th></tr></thead>
+    <tbody>${entries.map(([id,r])=>{
+      const tags=r.selected.map(sid=>{const c=courses.find(x=>x.id===sid);return c?`<span class="tag tag-blue">${c.title}</span>`:''}).join('');
+      return `<tr><td>${id}</td><td>${CL(r.grade,r.cls)}</td><td>${r.name}</td>
+        <td>${tags||'<span style="color:#aaa">없음</span>'}</td>
+        <td>${r.completed?'<span class="tag tag-green">완료</span>':'<span style="font-size:12px;color:#aaa">미완료</span>'}</td></tr>`;
+    }).join('')}</tbody></table>`;
+}
+
+function renderDownloadTab(){
+  const courses=getCourses();
+  const regs=getRegs();
+  let classHtml='';
+  GRADES.forEach(g=>{CLASSES.forEach(c=>{
+    const label=CL(g,c);
+    const cnt=Object.values(regs).filter(r=>r.grade===g&&r.cls===c).length;
+    classHtml+=`<div class="dl-card" onclick="downloadByClass(${g},${c})">
+      <span style="font-size:18px">📄</span>
+      <div><div class="dl-name">${label}</div><div class="dl-sub">${cnt}명</div></div>
+    </div>`;
+  });});
+  document.getElementById('dl-class-grid').innerHTML=classHtml;
+  document.getElementById('dl-course-grid').innerHTML=courses.map(c=>{
+    const cnt=Object.values(regs).filter(r=>r.selected.includes(c.id)).length;
+    return `<div class="dl-card" onclick="downloadByCourse(${c.id})">
+      <span style="font-size:18px">📄</span>
+      <div><div class="dl-name">${c.title}</div><div class="dl-sub">${cnt}명 신청</div></div>
+    </div>`;
+  }).join('');
+}
+
+function adminTab(tab){
+  ['courses','students','download','settings'].forEach(t=>{
+    document.getElementById('admin-'+t).style.display=t===tab?'block':'none';
+    document.getElementById('atab-'+t).classList.toggle('active',t===tab);
+  });
+  if(tab==='students')renderStudentTable();
+  if(tab==='download')renderDownloadTab();
+}
+
+function saveSettings(){
+  const newId=document.getElementById('new-t-id').value.trim();
+  const curPw=document.getElementById('cur-pw').value;
+  const newPw=document.getElementById('new-pw').value;
+  const newPw2=document.getElementById('new-pw2').value;
+  const msg=document.getElementById('set-msg');
+  const t=getTeacher();
+  if(curPw!==t.pw){msg.style.color='#d9534f';msg.textContent='현재 비밀번호가 일치하지 않습니다.';return;}
+  if(newPw&&newPw!==newPw2){msg.style.color='#d9534f';msg.textContent='새 비밀번호가 일치하지 않습니다.';return;}
+  if(newId)t.id=newId;
+  if(newPw)t.pw=newPw;
+  saveTeacher(t);
+  msg.style.color='#3B6D11';msg.textContent='저장되었습니다.';
+  ['new-t-id','cur-pw','new-pw','new-pw2'].forEach(x=>document.getElementById(x).value='');
+  setTimeout(()=>{msg.textContent='';},2500);
+}
+
+function resetAll(){
+  if(!confirm('모든 수강신청 데이터와 과목 목록을 초기화합니다. 계속하시겠습니까?'))return;
+  [K.C,K.R,K.N].forEach(k=>localStorage.removeItem(k));
+  alert('초기화되었습니다.');renderTeacherView();
+}
+
+function getNm(selected){
+  const courses=getCourses();
+  return selected.map(sid=>{const c=courses.find(x=>x.id===sid);return c?c.title:''}).filter(Boolean).join(', ');
+}
+
+function styleHeader(ws,lastCol){
+  for(let C=0;C<=lastCol;C++){
+    const addr=XLSX.utils.encode_cell({r:0,c:C});
+    if(!ws[addr])continue;
+    ws[addr].s={font:{bold:true,color:{rgb:'FFFFFF'},name:'Arial'},
+      fill:{fgColor:{rgb:'185FA5'}},alignment:{horizontal:'center'},
+      border:{bottom:{style:'thin',color:{rgb:'BBBBBB'}}}};
+  }
+}
+
+function makeSheet(headers,rows){
+  const ws=XLSX.utils.aoa_to_sheet([headers,...rows]);
+  ws['!cols']=headers.map(h=>({wch:Math.max(h.length+4,14)}));
+  styleHeader(ws,headers.length-1);
+  return ws;
+}
+
+function downloadAll(){
+  const wb=XLSX.utils.book_new();
+  const regs=getRegs();
+  const courses=getCourses();
+  XLSX.utils.book_append_sheet(wb,makeSheet(['학번','학년/반','이름','신청과목수','신청과목','상태'],
+    Object.entries(regs).map(([id,r])=>[id,CL(r.grade,r.cls),r.name,r.selected.length,getNm(r.selected),r.completed?'완료':'미완료'])),'전체 현황');
+  GRADES.forEach(g=>CLASSES.forEach(c=>{
+    const rows=Object.entries(regs).filter(([,r])=>r.grade===g&&r.cls===c)
+      .map(([id,r])=>[id,r.name,r.selected.length,getNm(r.selected),r.completed?'완료':'미완료']);
+    XLSX.utils.book_append_sheet(wb,makeSheet(['학번','이름','신청과목수','신청과목','상태'],rows),CL(g,c));
+  }));
+  courses.forEach(c=>{
+    const rows=Object.entries(regs).filter(([,r])=>r.selected.includes(c.id))
+      .map(([id,r])=>[id,CL(r.grade,r.cls),r.name,r.completed?'완료':'미완료']);
+    XLSX.utils.book_append_sheet(wb,makeSheet(['학번','학년/반','이름','상태'],rows),c.title.substring(0,30));
+  });
+  XLSX.writeFile(wb,'브니엘예술고_수강신청_전체.xlsx');
+}
+
+function downloadByClass(g,c){
+  const wb=XLSX.utils.book_new();
+  const label=CL(g,c);
+  const rows=Object.entries(getRegs()).filter(([,r])=>r.grade===g&&r.cls===c)
+    .map(([id,r])=>[id,r.name,r.selected.length,getNm(r.selected),r.completed?'완료':'미완료']);
+  XLSX.utils.book_append_sheet(wb,makeSheet(['학번','이름','신청과목수','신청과목','상태'],rows),label);
+  XLSX.writeFile(wb,'브니엘예술고_수강신청_'+label+'.xlsx');
+}
+
+function downloadByCourse(courseId){
+  const courses=getCourses();
+  const c=courses.find(x=>x.id===courseId);if(!c)return;
+  const wb=XLSX.utils.book_new();
+  const rows=Object.entries(getRegs()).filter(([,r])=>r.selected.includes(courseId))
+    .map(([id,r])=>[id,CL(r.grade,r.cls),r.name,r.completed?'완료':'미완료']);
+  XLSX.utils.book_append_sheet(wb,makeSheet(['학번','학년/반','이름','상태'],rows),c.title.substring(0,30));
+  XLSX.writeFile(wb,'브니엘예술고_'+c.title+'_수강신청.xlsx');
+}
+</script>
+</body>
+</html>
